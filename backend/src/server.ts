@@ -35,13 +35,6 @@ dotenv.config();
 
 // Initialize Express application
 const app: Application = express();
-const PORT = process.env.PORT || 5000;
-const httpServer = createServer(app);
-
-initSocket(httpServer);
-
-// Make 'io' accessible in Express req.app.get("io") for backwards compatibility
-app.set("io", getIO());
 
 // Middleware
 app.use(
@@ -108,17 +101,37 @@ app.use((err: any, req: Request, res: Response, next: any) => {
   });
 });
 
-// Start the server
-connectDB()
-  .then(() => {
-    httpServer.listen(PORT, () => {
-      console.log(
-        `🚀 Server + Socket.IO running in ${process.env.NODE_ENV} mode on port ${PORT}`,
+// Connect to DB eagerly (cached across warm invocations in serverless)
+let dbConnected = false;
+const ensureDB = async () => {
+  if (!dbConnected) {
+    await connectDB();
+    dbConnected = true;
+  }
+};
+ensureDB();
+
+// Only start HTTP server + Socket.IO when running as a long-lived process (not on Vercel)
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 5000;
+  const httpServer = createServer(app);
+  initSocket(httpServer);
+  app.set("io", getIO());
+
+  connectDB()
+    .then(() => {
+      httpServer.listen(PORT, () => {
+        console.log(
+          `🚀 Server + Socket.IO running in ${process.env.NODE_ENV} mode on port ${PORT}`,
+        );
+      });
+    })
+    .catch((error) => {
+      console.error(
+        `Failed to connect to the database: ${(error as Error).message}`,
       );
     });
-  })
-  .catch((error) => {
-    console.error(
-      `Failed to connect to the database: ${(error as Error).message}`,
-    );
-  });
+}
+
+// Export for Vercel serverless
+export default app;

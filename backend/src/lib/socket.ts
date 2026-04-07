@@ -1,7 +1,14 @@
 import { Server as SocketIOServer } from "socket.io";
 import { Server as HttpServer } from "http";
 
-let io: SocketIOServer;
+let io: SocketIOServer | null = null;
+
+// No-op emitter for serverless environments where Socket.IO is unavailable
+const noopEmitter = {
+  emit: () => noopEmitter,
+  to: () => noopEmitter,
+  in: () => noopEmitter,
+};
 
 export const initSocket = (server: HttpServer) => {
   io = new SocketIOServer(server, {
@@ -24,9 +31,10 @@ export const initSocket = (server: HttpServer) => {
   return io;
 };
 
-export const getIO = () => {
+export const getIO = (): any => {
   if (!io) {
-    throw new Error("Socket.io not initialized");
+    // Return a no-op emitter in serverless environments
+    return noopEmitter;
   }
   return io;
 };
