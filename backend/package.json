@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "watch": "bun --watch index.ts",
+    "build": "tsup src/server.ts --format esm --out-dir dist --no-splitting",
     "start:ngrok": "ngrok http 5000",
     "start:inngest": "npx inngest-cli@latest dev",
     "start:server": "nodemon --exec bun run src/server.ts",
@@ -12,7 +13,8 @@
   "devDependencies": {
     "@types/bun": "latest",
     "concurrently": "^9.2.1",
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "tsup": "^8.5.1"
   },
   "peerDependencies": {
     "typescript": "^5"
