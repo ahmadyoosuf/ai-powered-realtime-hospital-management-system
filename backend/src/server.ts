@@ -26,9 +26,7 @@ import notificationRouter from "./routes/notification";
 import labResultsRouter from "./routes/labResults";
 import invoiceRouter from "./routes/invoice";
 import { getIO, initSocket } from "./lib/socket";
-import { uploadRouter } from "./lib/uploadthing";
-import { createRouteHandler } from "uploadthing/express";
-import uploadthingRouter from "./routes/uploadthing";
+import blobUploadRouter from "./routes/upload";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -88,8 +86,7 @@ app.use(
     functions: [admitPatient, analyzeXRayJob, addChargeToInvoice],
   }),
 );
-app.use("/api/uploadthing", createRouteHandler({ router: uploadRouter }));
-app.use("/api/uploadthing/delete", uploadthingRouter);
+app.use("/api/upload", blobUploadRouter);
 
 // --- Global Error Handler ---
 app.use((err: any, req: Request, res: Response, next: any) => {

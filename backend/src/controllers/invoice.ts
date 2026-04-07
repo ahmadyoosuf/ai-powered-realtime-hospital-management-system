@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import invoice from "../models/invoice";
 import { fromNodeHeaders } from "better-auth/node";
 import mongoose from "mongoose";
-import { auth, polarClient } from "../lib/auth";
+import { auth } from "../lib/auth";
 
 export const getMyActiveInvoice = async (req: Request, res: Response) => {
   try {
@@ -113,26 +113,8 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const checkout = await polarClient.checkouts.create({
-      externalCustomerId: session.user.id, // Link the checkout to the authenticated user
-      products: [process.env.POLAR_PRODUCT_ID!],
-      prices: {
-        [process.env.POLAR_PRODUCT_ID!]: [
-          {
-            amountType: "fixed",
-            priceAmount: userInvoice.totalAmount, // e.g. 15000 = $150.00 (in cents)
-            priceCurrency: "usd",
-          },
-        ],
-      },
-      metadata: {
-        hospitalInvoiceId: userInvoice._id.toString(),
-        patientId: userInvoice.patientId,
-      },
-      // Where to redirect after success
-      successUrl: `${process.env.FRONTEND_URL}/profile/${userInvoice.patientId}?checkout_id={CHECKOUT_ID}`,
-      returnUrl: `${process.env.FRONTEND_URL}/profile/${userInvoice.patientId}`,
-    });
+    // Polar checkout disabled - payment system not configured
+    return res.status(501).json({ message: "Payment system not configured" });
 
     // Redirect customer to checkout.url
     // 3. Save checkout ID to Mongo

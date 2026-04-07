@@ -141,7 +141,7 @@ export const createLabResult = async (data: {
 };
 
 export const deleteFile = async ({ file }: { file: string }) => {
-  const res = await fetch(`${API_URL}/uploadthing/delete`, {
+  const res = await fetch(`${API_URL}/upload`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
