@@ -3,7 +3,7 @@ import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { admin } from "better-auth/plugins";
 import { MongoClient } from "mongodb";
 
-const client = new MongoClient(process.env.MONGO_URI || "");
+const client = new MongoClient(process.env.MONGODB_URI || process.env.MONGO_URI || "");
 const db = client.db();
 
 // Build plugins list - only include Polar if credentials are configured
