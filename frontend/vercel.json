@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://mdhms-api.vercel.app/api/:path*" }
+  ]
+}
